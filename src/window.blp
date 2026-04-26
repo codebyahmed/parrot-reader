@@ -2,9 +2,13 @@ using Gtk 4.0;
 using Adw 1;
 
 template $ParrotReaderWindow: Adw.ApplicationWindow {
-  title: _("Parrot-reader");
+  title: _("Parrot");
   default-width: 800;
   default-height: 600;
+
+  styles [
+    "view",
+  ]
 
   content: Adw.ToolbarView {
     [top]
@@ -18,12 +22,28 @@ template $ParrotReaderWindow: Adw.ApplicationWindow {
       }
     }
 
-    content: Label label {
-      label: _("Hello, World!");
+    content: Box {
+      orientation: vertical;
 
-      styles [
-        "title-1",
-      ]
+      ScrolledWindow {
+        hexpand: true;
+        vexpand: true;
+
+        TextView textview {
+          bottom-margin: 24;
+          left-margin: 24;
+          right-margin: 24;
+          top-margin: 24;
+          pixels-above-lines: 4;
+          pixels-below-lines: 4;
+          pixels-inside-wrap: 4;
+          wrap-mode: word_char;
+
+          styles [
+            "parrot-text",
+          ]
+        }
+      }
     };
   };
 }
@@ -41,7 +61,7 @@ menu primary_menu {
     }
 
     item {
-      label: _("_About Parrot-reader");
+      label: _("_About Parrot");
       action: "app.about";
     }
   }
