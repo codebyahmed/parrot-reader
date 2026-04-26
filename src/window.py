@@ -24,7 +24,7 @@ from gi.repository import Gtk
 class ParrotReaderWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'ParrotReaderWindow'
 
-    label = Gtk.Template.Child()
+    text_view = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
