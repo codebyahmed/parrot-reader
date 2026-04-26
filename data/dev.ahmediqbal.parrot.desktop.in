@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Parrot-reader
+Exec=parrot-reader
+Icon=dev.ahmediqbal.parrot
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=GTK;
+StartupNotify=true
+DBusActivatable=true

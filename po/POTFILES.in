@@ -1,0 +1,8 @@
+# List of source files containing translatable strings.
+# Please keep this file sorted alphabetically.
+data/dev.ahmediqbal.parrot.desktop.in
+data/dev.ahmediqbal.parrot.metainfo.xml.in
+data/dev.ahmediqbal.parrot.gschema.xml
+src/main.py
+src/window.py
+src/window.blp

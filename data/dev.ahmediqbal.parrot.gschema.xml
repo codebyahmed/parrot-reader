@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="parrot-reader">
+	<schema id="dev.ahmediqbal.parrot" path="/dev/ahmediqbal/parrot/">
+	</schema>
+</schemalist>

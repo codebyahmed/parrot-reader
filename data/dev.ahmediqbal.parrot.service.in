@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=dev.ahmediqbal.parrot
+Exec=@bindir@/parrot-reader --gapplication-service
