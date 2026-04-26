@@ -5,4 +5,7 @@
     <file preprocess="xml-stripblanks">shortcuts-dialog.ui</file>
     <file>style.css</file>
   </gresource>
+  <gresource prefix="/dev/ahmediqbal/parrot/icons/scalable/actions/">
+    <file preprocess="xml-stripblanks" alias="sound-symbolic.svg">../data/icons/scalable/actions/sound-symbolic.svg</file>
+  </gresource>
 </gresources>
