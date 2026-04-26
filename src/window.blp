@@ -30,10 +30,10 @@ template $ParrotReaderWindow: Adw.ApplicationWindow {
         vexpand: true;
 
         TextView textview {
-          bottom-margin: 24;
+          bottom-margin: 12;
           left-margin: 24;
           right-margin: 24;
-          top-margin: 24;
+          top-margin: 12;
           pixels-above-lines: 4;
           pixels-below-lines: 4;
           pixels-inside-wrap: 4;
@@ -41,6 +41,21 @@ template $ParrotReaderWindow: Adw.ApplicationWindow {
 
           styles [
             "parrot-text",
+          ]
+        }
+      }
+
+      Box {
+        halign: center;
+        margin-top: 18;
+        margin-bottom: 24;
+
+        Button start_listening_button {
+          label: _("Start Listening");
+
+          styles [
+            "suggested-action",
+            "pill",
           ]
         }
       }
