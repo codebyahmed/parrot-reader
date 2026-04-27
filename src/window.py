@@ -17,14 +17,31 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from gi.repository import Adw
-from gi.repository import Gtk
+from gi.repository import Adw, Gtk, Gio
+from .voice_dialog import VoiceDialog, get_voice_name
+
 
 @Gtk.Template(resource_path='/dev/ahmediqbal/parrot/window.ui')
 class ParrotReaderWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'ParrotReaderWindow'
 
     text_view = Gtk.Template.Child()
+    voice_selector_button = Gtk.Template.Child()
+    voice_selector_content = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.settings = Gio.Settings(schema_id='dev.ahmediqbal.parrot')
+        self.current_voice_id = self.settings.get_string('voice-id')
+        self.voice_selector_content.set_label(get_voice_name(self.current_voice_id))
+        self.voice_selector_button.connect('clicked', self._on_voice_button_clicked)
+
+    def _on_voice_button_clicked(self, _button):
+        dialog = VoiceDialog(current_voice_id=self.current_voice_id)
+        dialog.connect('voice-confirmed', self._on_voice_confirmed)
+        dialog.present(self)
+
+    def _on_voice_confirmed(self, _dialog, voice_id):
+        self.current_voice_id = voice_id
+        self.settings.set_string('voice-id', voice_id)
+        self.voice_selector_content.set_label(get_voice_name(voice_id))

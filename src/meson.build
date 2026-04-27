@@ -4,6 +4,7 @@ gnome = import('gnome')
 blueprints = custom_target('blueprints',
   input: files(
     'shortcuts-dialog.blp',
+    'voice-dialog.blp',
     'window.blp',
   ),
   output: '.',
@@ -38,6 +39,7 @@ configure_file(
 parrot_reader_sources = [
   '__init__.py',
   'main.py',
+  'voice_dialog.py',
   'window.py',
 ]
 
