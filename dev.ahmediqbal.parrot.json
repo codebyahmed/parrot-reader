@@ -25,6 +25,21 @@
     "modules": [
         "python3-modules.json",
         {
+            "name": "kokoro-model",
+            "buildsystem": "simple",
+            "build-commands": [
+                "install -Dm644 model.onnx ${FLATPAK_DEST}/share/parrot-reader/model.onnx"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX-timestamped/resolve/main/onnx/model.onnx",
+                    "sha256": "651ea8291843a92276a4a003581a215cb07d15e47dde6fcfb1b768f9a1682054",
+                    "dest-filename": "model.onnx"
+                }
+            ]
+        },
+        {
             "name": "parrot-reader",
             "builddir": true,
             "buildsystem": "meson",
