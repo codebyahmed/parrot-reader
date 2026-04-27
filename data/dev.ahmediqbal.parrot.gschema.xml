@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="parrot-reader">
 	<schema id="dev.ahmediqbal.parrot" path="/dev/ahmediqbal/parrot/">
+		<key name="voice-id" type="s">
+			<default>"af_heart"</default>
+			<summary>Selected TTS voice</summary>
+		</key>
 	</schema>
 </schemalist>

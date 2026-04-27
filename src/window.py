@@ -17,7 +17,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from gi.repository import Adw, Gtk
+from gi.repository import Adw, Gtk, Gio
 from .voice_dialog import VoiceDialog, get_voice_name
 
 
@@ -31,7 +31,8 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.current_voice_id = 'bf_emma'
+        self.settings = Gio.Settings(schema_id='dev.ahmediqbal.parrot')
+        self.current_voice_id = self.settings.get_string('voice-id')
         self.voice_selector_content.set_label(get_voice_name(self.current_voice_id))
         self.voice_selector_button.connect('clicked', self._on_voice_button_clicked)
 
@@ -42,4 +43,5 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
 
     def _on_voice_confirmed(self, _dialog, voice_id):
         self.current_voice_id = voice_id
+        self.settings.set_string('voice-id', voice_id)
         self.voice_selector_content.set_label(get_voice_name(voice_id))
