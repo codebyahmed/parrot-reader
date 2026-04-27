@@ -28,6 +28,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
     text_view = Gtk.Template.Child()
     voice_selector_button = Gtk.Template.Child()
     voice_selector_content = Gtk.Template.Child()
+    start_listening_button = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -35,6 +36,11 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         self.current_voice_id = self.settings.get_string('voice-id')
         self.voice_selector_content.set_label(get_voice_name(self.current_voice_id))
         self.voice_selector_button.connect('clicked', self._on_voice_button_clicked)
+        self.text_view.get_buffer().connect('changed', self._on_text_changed)
+        self.start_listening_button.set_sensitive(False)
+
+    def _on_text_changed(self, buffer):
+        self.start_listening_button.set_sensitive(buffer.get_char_count() > 0)
 
     def _on_voice_button_clicked(self, _button):
         dialog = VoiceDialog(current_voice_id=self.current_voice_id)
