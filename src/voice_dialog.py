@@ -59,7 +59,7 @@ class VoiceDialog(Adw.Dialog):
 
     def _populate_voices(self):
         for i, vid in enumerate(VOICE_IDS):
-            row = Adw.ActionRow(title=get_voice_name(vid))
+            row = Adw.ActionRow(title=get_voice_name(vid), subtitle=get_voice_gender(vid))
             row._voice_id = vid
             self.voice_list.append(row)
 
