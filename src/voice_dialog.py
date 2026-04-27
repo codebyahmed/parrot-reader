@@ -21,8 +21,8 @@ _LANG = {
     'h': "Hindi",
     'i': "Italian",
     'j': "Japanese",
-    'p': "Brazilian Portuguese",
-    'z': "Mandarin Chinese",
+    'p': "Portuguese",
+    'z': "Mandarin",
 }
 
 _GENDER = {'f': "Female", 'm': "Male"}
