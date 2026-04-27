@@ -1,0 +1,43 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $VoiceDialog: Adw.Dialog {
+  title: _("Select Voice");
+  content-width: 360;
+  content-height: 540;
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Box {
+      orientation: vertical;
+      spacing: 16;
+      margin-start: 16;
+      margin-end: 16;
+      margin-top: 8;
+      margin-bottom: 16;
+
+      ScrolledWindow {
+        vexpand: true;
+
+        ListBox voice_list {
+          selection-mode: single;
+
+          styles [
+            "boxed-list",
+          ]
+        }
+      }
+
+      Button confirm_voice_button {
+        label: _("Confirm");
+
+        styles [
+          "suggested-action",
+          "pill",
+        ]
+      }
+    };
+  };
+}
