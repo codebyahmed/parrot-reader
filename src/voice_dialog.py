@@ -27,6 +27,8 @@ _LANG = {
 
 _GENDER = {'f': "Female", 'm': "Male"}
 
+LANGUAGES = sorted(_LANG.values())
+
 
 def get_voice_name(voice_id):
     return voice_id.split('_', 1)[1].capitalize()
@@ -48,23 +50,38 @@ class VoiceDialog(Adw.Dialog):
 
     voice_list = Gtk.Template.Child()
     confirm_voice_button = Gtk.Template.Child()
+    language_dropdown = Gtk.Template.Child()
 
     def __init__(self, current_voice_id, **kwargs):
         super().__init__(**kwargs)
         self.selected_voice_id = current_voice_id if current_voice_id in VOICE_IDS else VOICE_IDS[0]
 
+        self.language_dropdown.set_model(Gtk.StringList.new(LANGUAGES))
+        initial_lang = get_voice_language(self.selected_voice_id)
+        self.language_dropdown.set_selected(LANGUAGES.index(initial_lang) if initial_lang in LANGUAGES else 0)
+
         self._populate_voices()
+        self.voice_list.set_filter_func(self._filter_row)
+
+        self.language_dropdown.connect('notify::selected', self._on_language_changed)
         self.voice_list.connect('row-selected', self._on_row_selected)
         self.confirm_voice_button.connect('clicked', self._on_confirm)
 
     def _populate_voices(self):
-        for i, vid in enumerate(VOICE_IDS):
+        for vid in VOICE_IDS:
             row = Adw.ActionRow(title=get_voice_name(vid), subtitle=get_voice_gender(vid))
             row._voice_id = vid
             self.voice_list.append(row)
 
             if vid == self.selected_voice_id:
-                self.voice_list.select_row(self.voice_list.get_row_at_index(i))
+                self.voice_list.select_row(row)
+
+    def _filter_row(self, row):
+        selected = self.language_dropdown.get_selected()
+        return get_voice_language(row._voice_id) == LANGUAGES[selected]
+
+    def _on_language_changed(self, *_):
+        self.voice_list.invalidate_filter()
 
     def _on_row_selected(self, _list_box, row):
         if row:
