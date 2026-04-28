@@ -40,6 +40,22 @@
             ]
         },
         {
+            "name": "kokoro-voices",
+            "buildsystem": "simple",
+            "build-commands": [
+                "mkdir -p ${FLATPAK_DEST}/share/parrot-reader/voices",
+                "cp *.bin ${FLATPAK_DEST}/share/parrot-reader/voices/"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/codebyahmed/parrot-reader/releases/download/assets-v0.1/voices.tar.xz",
+                    "sha256": "1bdc97b9999867e95d97ce36900083128bf3af295fd188a0a4a513946cd1ac65",
+                    "strip-components": 0
+                }
+            ]
+        },
+        {
             "name": "parrot-reader",
             "builddir": true,
             "buildsystem": "meson",
