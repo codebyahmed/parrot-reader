@@ -71,7 +71,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         out_path = os.path.join(out_dir, f'audio_{timestamp}.wav')
 
-        tts_player = TtsPlayer(text=text)
+        tts_player = TtsPlayer(text=text, voice_id=self.current_voice_id)
         self.navigation_view.push(tts_player)
 
         threading.Thread(

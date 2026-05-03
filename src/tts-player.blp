@@ -6,7 +6,11 @@ template $TtsPlayer: Adw.NavigationPage {
 
   child: Adw.ToolbarView {
     [top]
-    Adw.HeaderBar {}
+    Adw.HeaderBar {
+      title-widget: Adw.WindowTitle window_title {
+        title: _("Now Playing");
+      };
+    }
 
     content: Box {
       orientation: vertical;

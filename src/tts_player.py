@@ -2,6 +2,7 @@ import gi
 gi.require_version('Gst', '1.0')
 
 from gi.repository import Adw, Gtk, GLib, Gst
+from .voice_dialog import get_voice_name, get_voice_language
 
 Gst.init(None)
 
@@ -17,11 +18,13 @@ class TtsPlayer(Adw.NavigationPage):
     play_pause_button = Gtk.Template.Child()
     rewind_button = Gtk.Template.Child()
     forward_button = Gtk.Template.Child()
+    window_title = Gtk.Template.Child()
 
     _SKIP_NS = 10 * Gst.SECOND
 
-    def __init__(self, text: str, **kwargs):
+    def __init__(self, text: str, voice_id: str, **kwargs):
         super().__init__(**kwargs)
+        self.window_title.set_subtitle(f'{get_voice_name(voice_id)} • {get_voice_language(voice_id)}')
         self._pipeline = None
         self._position_timer = None
         self._seek_updating = False
