@@ -12,6 +12,8 @@ class TtsPlayer(Adw.NavigationPage):
 
     player_text_view = Gtk.Template.Child()
     seek_bar = Gtk.Template.Child()
+    position_label = Gtk.Template.Child()
+    duration_label = Gtk.Template.Child()
     play_pause_button = Gtk.Template.Child()
     rewind_button = Gtk.Template.Child()
     forward_button = Gtk.Template.Child()
@@ -34,6 +36,11 @@ class TtsPlayer(Adw.NavigationPage):
         self.seek_bar.connect('value-changed', self._on_seek_changed)
         self.connect('hiding', self._on_hiding)
 
+    @staticmethod
+    def _fmt(ns):
+        s = ns // Gst.SECOND
+        return f'{s // 60}:{s % 60:02d}'
+
     def on_synthesis_done(self, path, _error):
         if path:
             self._pipeline = Gst.ElementFactory.make('playbin3', 'player')
@@ -42,10 +49,17 @@ class TtsPlayer(Adw.NavigationPage):
             bus.add_signal_watch()
             bus.connect('message::eos', self._on_eos)
             bus.connect('message::error', self._on_error)
+            bus.connect('message::async-done', self._on_async_done)
+            self._pipeline.set_state(Gst.State.PAUSED)
             self.play_pause_button.set_sensitive(True)
             self.rewind_button.set_sensitive(True)
             self.forward_button.set_sensitive(True)
         return False
+
+    def _on_async_done(self, _bus, _msg):
+        ok, dur = self._pipeline.query_duration(Gst.Format.TIME)
+        if ok and dur > 0:
+            self.duration_label.set_label(self._fmt(dur))
 
     def _skip(self, delta_ns):
         if not self._pipeline:
@@ -63,6 +77,10 @@ class TtsPlayer(Adw.NavigationPage):
                 Gst.SeekType.NONE,
                 0,
             )
+            self._seek_updating = True
+            self.seek_bar.set_value((new_pos / dur) * 100)
+            self._seek_updating = False
+            self.position_label.set_label(self._fmt(new_pos))
 
     def _on_rewind_clicked(self, _button):
         self._skip(-self._SKIP_NS)
@@ -94,6 +112,8 @@ class TtsPlayer(Adw.NavigationPage):
             self._seek_updating = True
             self.seek_bar.set_value((pos / dur) * 100)
             self._seek_updating = False
+            self.position_label.set_label(self._fmt(pos))
+            self.duration_label.set_label(self._fmt(dur))
         return True
 
     def _on_seek_changed(self, scale):
@@ -105,6 +125,7 @@ class TtsPlayer(Adw.NavigationPage):
         ok, dur = self._pipeline.query_duration(Gst.Format.TIME)
         if ok:
             pos = int((scale.get_value() / 100) * dur)
+            self.position_label.set_label(self._fmt(pos))
             self._pipeline.seek(
                 1.0,
                 Gst.Format.TIME,
@@ -121,6 +142,7 @@ class TtsPlayer(Adw.NavigationPage):
         self._seek_updating = True
         self.seek_bar.set_value(0)
         self._seek_updating = False
+        self.position_label.set_label('0:00')
         if self._position_timer:
             GLib.source_remove(self._position_timer)
             self._position_timer = None

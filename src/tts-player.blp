@@ -39,15 +39,33 @@ template $TtsPlayer: Adw.NavigationPage {
         orientation: vertical;
         spacing: 12;
 
-        Scale seek_bar {
+        Box {
           orientation: horizontal;
-          draw-value: false;
+          spacing: 8;
 
-          adjustment: Adjustment {
-            lower: 0;
-            upper: 100;
-            value: 0;
-          };
+          Label position_label {
+            label: "0:00";
+            width-chars: 4;
+            xalign: 0;
+          }
+
+          Scale seek_bar {
+            orientation: horizontal;
+            draw-value: false;
+            hexpand: true;
+
+            adjustment: Adjustment {
+              lower: 0;
+              upper: 100;
+              value: 0;
+            };
+          }
+
+          Label duration_label {
+            label: "0:00";
+            width-chars: 4;
+            xalign: 1;
+          }
         }
 
         Box {
