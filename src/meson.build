@@ -36,9 +36,19 @@ configure_file(
   install_mode: 'rwxr-xr-x'
 )
 
+configure_file(
+  input: '_config.py.in',
+  output: '_config.py',
+  configuration: conf,
+  install: true,
+  install_dir: moduledir,
+)
+
 parrot_reader_sources = [
   '__init__.py',
   'main.py',
+  'trim.py',
+  'tts.py',
   'voice_dialog.py',
   'window.py',
 ]

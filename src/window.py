@@ -17,7 +17,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from gi.repository import Adw, Gtk, Gio
+import os
+import threading
+from datetime import datetime
+
+from gi.repository import Adw, Gtk, Gio, GLib
 from .voice_dialog import VoiceDialog, get_voice_name
 
 
@@ -29,6 +33,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
     voice_selector_button = Gtk.Template.Child()
     voice_selector_content = Gtk.Template.Child()
     start_listening_button = Gtk.Template.Child()
+    toast_overlay = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -38,6 +43,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         self.voice_selector_button.connect('clicked', self._on_voice_button_clicked)
         self.text_view.get_buffer().connect('changed', self._on_text_changed)
         self.start_listening_button.set_sensitive(False)
+        self.start_listening_button.connect('clicked', self._on_start_listening_clicked)
 
     def _on_text_changed(self, buffer):
         self.start_listening_button.set_sensitive(buffer.get_char_count() > 0)
@@ -51,3 +57,38 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         self.current_voice_id = voice_id
         self.settings.set_string('voice-id', voice_id)
         self.voice_selector_content.set_label(get_voice_name(voice_id))
+
+    def _on_start_listening_clicked(self, _button):
+        buffer = self.text_view.get_buffer()
+        start, end = buffer.get_bounds()
+        text = buffer.get_text(start, end, False)
+        if not text.strip():
+            return
+
+        self.start_listening_button.set_sensitive(False)
+
+        out_dir = os.path.join(GLib.get_user_data_dir(), 'recordings')
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        out_path = os.path.join(out_dir, f'audio_{timestamp}.wav')
+
+        threading.Thread(
+            target=self._run_synthesis,
+            args=(text, self.current_voice_id, out_path),
+            daemon=True,
+        ).start()
+
+    def _run_synthesis(self, text, voice, out_path):
+        from .tts import synthesize
+        try:
+            path = synthesize(text, voice, out_path)
+            GLib.idle_add(self._on_synthesis_done, path, None)
+        except Exception as exc:
+            GLib.idle_add(self._on_synthesis_done, None, str(exc))
+
+    def _on_synthesis_done(self, path, error):
+        self.start_listening_button.set_sensitive(True)
+        if error:
+            self.toast_overlay.add_toast(Adw.Toast(title=f'Error: {error}'))
+        else:
+            self.toast_overlay.add_toast(Adw.Toast(title=f'Saved to {path}'))
+        return False
