@@ -140,15 +140,24 @@ class TtsPlayer(Adw.NavigationPage):
             )
 
     def _on_eos(self, _bus, _msg):
-        self._pipeline.set_state(Gst.State.NULL)
+        if self._position_timer:
+            GLib.source_remove(self._position_timer)
+            self._position_timer = None
+        self._pipeline.seek(
+            1.0,
+            Gst.Format.TIME,
+            Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
+            Gst.SeekType.SET,
+            0,
+            Gst.SeekType.NONE,
+            0,
+        )
+        self._pipeline.set_state(Gst.State.PAUSED)
         self.play_pause_button.set_icon_name('media-playback-start-symbolic')
         self._seek_updating = True
         self.seek_bar.set_value(0)
         self._seek_updating = False
         self.position_label.set_label('0:00')
-        if self._position_timer:
-            GLib.source_remove(self._position_timer)
-            self._position_timer = None
 
     def _on_error(self, _bus, msg):
         err, _ = msg.parse_error()
@@ -163,4 +172,7 @@ class TtsPlayer(Adw.NavigationPage):
             GLib.source_remove(self._position_timer)
             self._position_timer = None
         if self._pipeline:
+            bus = self._pipeline.get_bus()
+            bus.remove_signal_watch()
             self._pipeline.set_state(Gst.State.NULL)
+            self._pipeline = None
