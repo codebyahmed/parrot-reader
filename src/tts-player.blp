@@ -1,0 +1,68 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TtsPlayer: Adw.NavigationPage {
+  title: _("Now Playing");
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Box {
+      orientation: vertical;
+      margin-start: 24;
+      margin-end: 24;
+      margin-top: 12;
+      margin-bottom: 24;
+      spacing: 18;
+
+      ScrolledWindow {
+        vexpand: true;
+
+        TextView player_text_view {
+          editable: false;
+          cursor-visible: false;
+          wrap-mode: word_char;
+          pixels-above-lines: 4;
+          pixels-below-lines: 4;
+          pixels-inside-wrap: 4;
+          left-margin: 8;
+          right-margin: 8;
+
+          styles [
+            "parrot-text",
+          ]
+        }
+      }
+
+      Box {
+        orientation: vertical;
+        spacing: 12;
+
+        Scale seek_bar {
+          orientation: horizontal;
+          draw-value: false;
+
+          adjustment: Adjustment {
+            lower: 0;
+            upper: 100;
+            value: 0;
+          };
+        }
+
+        Box {
+          halign: center;
+
+          Button play_pause_button {
+            icon-name: "media-playback-start-symbolic";
+
+            styles [
+              "circular",
+              "suggested-action",
+            ]
+          }
+        }
+      }
+    };
+  };
+}

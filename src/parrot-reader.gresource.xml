@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/dev/ahmediqbal/parrot">
     <file preprocess="xml-stripblanks">window.ui</file>
+    <file preprocess="xml-stripblanks">tts-player.ui</file>
     <file preprocess="xml-stripblanks">shortcuts-dialog.ui</file>
     <file preprocess="xml-stripblanks">voice-dialog.ui</file>
     <file>style.css</file>
