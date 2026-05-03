@@ -31,41 +31,43 @@ template $ParrotReaderWindow: Adw.ApplicationWindow {
       }
     }
 
-    content: Box {
-      orientation: vertical;
-
-      ScrolledWindow {
-        hexpand: true;
-        vexpand: true;
-
-        TextView text_view {
-          bottom-margin: 12;
-          left-margin: 24;
-          right-margin: 24;
-          top-margin: 12;
-          pixels-above-lines: 4;
-          pixels-below-lines: 4;
-          pixels-inside-wrap: 4;
-          wrap-mode: word_char;
-
-          styles [
-            "parrot-text",
-          ]
-        }
-      }
-
+    content: Adw.ToastOverlay toast_overlay {
       Box {
-        halign: center;
-        margin-top: 18;
-        margin-bottom: 24;
+        orientation: vertical;
 
-        Button start_listening_button {
-          label: _("Start Listening");
+        ScrolledWindow {
+          hexpand: true;
+          vexpand: true;
 
-          styles [
-            "suggested-action",
-            "pill",
-          ]
+          TextView text_view {
+            bottom-margin: 12;
+            left-margin: 24;
+            right-margin: 24;
+            top-margin: 12;
+            pixels-above-lines: 4;
+            pixels-below-lines: 4;
+            pixels-inside-wrap: 4;
+            wrap-mode: word_char;
+
+            styles [
+              "parrot-text",
+            ]
+          }
+        }
+
+        Box {
+          halign: center;
+          margin-top: 18;
+          margin-bottom: 24;
+
+          Button start_listening_button {
+            label: _("Start Listening");
+
+            styles [
+              "suggested-action",
+              "pill",
+            ]
+          }
         }
       }
     };

@@ -1,17 +1,17 @@
 {
-    "id" : "dev.ahmediqbal.parrot",
-    "runtime" : "org.gnome.Platform",
-    "runtime-version" : "49",
-    "sdk" : "org.gnome.Sdk",
-    "command" : "parrot-reader",
-    "finish-args" : [
+    "id": "dev.ahmediqbal.parrot",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "49",
+    "sdk": "org.gnome.Sdk",
+    "command": "parrot-reader",
+    "finish-args": [
         "--share=network",
         "--share=ipc",
         "--socket=fallback-x11",
         "--device=dri",
         "--socket=wayland"
     ],
-    "cleanup" : [
+    "cleanup": [
         "/include",
         "/lib/pkgconfig",
         "/man",
@@ -22,15 +22,63 @@
         "*.la",
         "*.a"
     ],
-    "modules" : [
+    "modules": [
+        "python3-modules.json",
         {
-            "name" : "parrot-reader",
-            "builddir" : true,
-            "buildsystem" : "meson",
-            "sources" : [
+            "name": "espeak-ng",
+            "config-opts": [
+                "--with-mbrola=no",
+                "--with-pcaudiolib=no",
+                "--with-klatt=no",
+                "--with-sonic=no"
+            ],
+            "sources": [
                 {
-                    "type" : "git",
-                    "url" : "file:///home/matar/Projects"
+                    "type": "archive",
+                    "url": "https://github.com/espeak-ng/espeak-ng/archive/refs/tags/1.52.0.tar.gz",
+                    "sha256": "bb4338102ff3b49a81423da8a1a158b420124b055b60fa76cfb4b18677130a23"
+                }
+            ]
+        },
+        {
+            "name": "kokoro-model",
+            "buildsystem": "simple",
+            "build-commands": [
+                "install -Dm644 model.onnx ${FLATPAK_DEST}/share/parrot-reader/model.onnx"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX-timestamped/resolve/main/onnx/model.onnx",
+                    "sha256": "651ea8291843a92276a4a003581a215cb07d15e47dde6fcfb1b768f9a1682054",
+                    "dest-filename": "model.onnx"
+                }
+            ]
+        },
+        {
+            "name": "kokoro-voices",
+            "buildsystem": "simple",
+            "build-commands": [
+                "mkdir -p ${FLATPAK_DEST}/share/parrot-reader/voices",
+                "cp *.bin ${FLATPAK_DEST}/share/parrot-reader/voices/"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/codebyahmed/parrot-reader/releases/download/assets-v0.1/voices.tar.xz",
+                    "sha256": "1bdc97b9999867e95d97ce36900083128bf3af295fd188a0a4a513946cd1ac65",
+                    "strip-components": 0
+                }
+            ]
+        },
+        {
+            "name": "parrot-reader",
+            "builddir": true,
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "file:///home/matar/Projects"
                 }
             ]
         }
