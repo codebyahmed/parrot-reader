@@ -52,6 +52,17 @@ template $TtsPlayer: Adw.NavigationPage {
 
         Box {
           halign: center;
+          spacing: 12;
+
+          Button rewind_button {
+            icon-name: "skip-backwards-10-symbolic";
+            tooltip-text: _("Rewind 10 seconds");
+
+            styles [
+              "flat",
+              "circular",
+            ]
+          }
 
           Button play_pause_button {
             icon-name: "media-playback-start-symbolic";
@@ -59,6 +70,16 @@ template $TtsPlayer: Adw.NavigationPage {
             styles [
               "circular",
               "suggested-action",
+            ]
+          }
+
+          Button forward_button {
+            icon-name: "skip-forward-10-symbolic";
+            tooltip-text: _("Forward 10 seconds");
+
+            styles [
+              "flat",
+              "circular",
             ]
           }
         }

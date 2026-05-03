@@ -13,6 +13,10 @@ class TtsPlayer(Adw.NavigationPage):
     player_text_view = Gtk.Template.Child()
     seek_bar = Gtk.Template.Child()
     play_pause_button = Gtk.Template.Child()
+    rewind_button = Gtk.Template.Child()
+    forward_button = Gtk.Template.Child()
+
+    _SKIP_NS = 10 * Gst.SECOND
 
     def __init__(self, text: str, **kwargs):
         super().__init__(**kwargs)
@@ -22,7 +26,11 @@ class TtsPlayer(Adw.NavigationPage):
 
         self.player_text_view.get_buffer().set_text(text)
         self.play_pause_button.set_sensitive(False)
+        self.rewind_button.set_sensitive(False)
+        self.forward_button.set_sensitive(False)
         self.play_pause_button.connect('clicked', self._on_play_pause_clicked)
+        self.rewind_button.connect('clicked', self._on_rewind_clicked)
+        self.forward_button.connect('clicked', self._on_forward_clicked)
         self.seek_bar.connect('value-changed', self._on_seek_changed)
         self.connect('hiding', self._on_hiding)
 
@@ -35,7 +43,32 @@ class TtsPlayer(Adw.NavigationPage):
             bus.connect('message::eos', self._on_eos)
             bus.connect('message::error', self._on_error)
             self.play_pause_button.set_sensitive(True)
+            self.rewind_button.set_sensitive(True)
+            self.forward_button.set_sensitive(True)
         return False
+
+    def _skip(self, delta_ns):
+        if not self._pipeline:
+            return
+        ok, pos = self._pipeline.query_position(Gst.Format.TIME)
+        ok_dur, dur = self._pipeline.query_duration(Gst.Format.TIME)
+        if ok and ok_dur:
+            new_pos = max(0, min(pos + delta_ns, dur))
+            self._pipeline.seek(
+                1.0,
+                Gst.Format.TIME,
+                Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
+                Gst.SeekType.SET,
+                new_pos,
+                Gst.SeekType.NONE,
+                0,
+            )
+
+    def _on_rewind_clicked(self, _button):
+        self._skip(-self._SKIP_NS)
+
+    def _on_forward_clicked(self, _button):
+        self._skip(self._SKIP_NS)
 
     def _on_play_pause_clicked(self, _button):
         if not self._pipeline:

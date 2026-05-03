@@ -9,5 +9,7 @@
   </gresource>
   <gresource prefix="/dev/ahmediqbal/parrot/icons/scalable/actions/">
     <file preprocess="xml-stripblanks" alias="sound-symbolic.svg">../data/icons/scalable/actions/sound-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="skip-backwards-10-symbolic.svg">../data/icons/scalable/actions/skip-backwards-10-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="skip-forward-10-symbolic.svg">../data/icons/scalable/actions/skip-forward-10-symbolic.svg</file>
   </gresource>
 </gresources>
