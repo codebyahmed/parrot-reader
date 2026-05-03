@@ -23,6 +23,7 @@ from datetime import datetime
 
 from gi.repository import Adw, Gtk, Gio, GLib
 from .voice_dialog import VoiceDialog, get_voice_name
+from .tts_player import TtsPlayer
 
 
 @Gtk.Template(resource_path='/dev/ahmediqbal/parrot/window.ui')
@@ -34,6 +35,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
     voice_selector_content = Gtk.Template.Child()
     start_listening_button = Gtk.Template.Child()
     toast_overlay = Gtk.Template.Child()
+    navigation_view = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -65,30 +67,23 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         if not text.strip():
             return
 
-        self.start_listening_button.set_sensitive(False)
-
         out_dir = os.path.join(GLib.get_user_data_dir(), 'recordings')
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         out_path = os.path.join(out_dir, f'audio_{timestamp}.wav')
 
+        tts_player = TtsPlayer(text=text, voice_id=self.current_voice_id)
+        self.navigation_view.push(tts_player)
+
         threading.Thread(
             target=self._run_synthesis,
-            args=(text, self.current_voice_id, out_path),
+            args=(text, self.current_voice_id, out_path, tts_player),
             daemon=True,
         ).start()
 
-    def _run_synthesis(self, text, voice, out_path):
+    def _run_synthesis(self, text, voice, out_path, tts_player):
         from .tts import synthesize
         try:
             path = synthesize(text, voice, out_path)
-            GLib.idle_add(self._on_synthesis_done, path, None)
+            GLib.idle_add(tts_player.on_synthesis_done, path, None)
         except Exception as exc:
-            GLib.idle_add(self._on_synthesis_done, None, str(exc))
-
-    def _on_synthesis_done(self, path, error):
-        self.start_listening_button.set_sensitive(True)
-        if error:
-            self.toast_overlay.add_toast(Adw.Toast(title=f'Error: {error}'))
-        else:
-            self.toast_overlay.add_toast(Adw.Toast(title=f'Saved to {path}'))
-        return False
+            GLib.idle_add(tts_player.on_synthesis_done, None, str(exc))

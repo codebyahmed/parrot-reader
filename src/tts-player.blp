@@ -1,0 +1,111 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TtsPlayer: Adw.NavigationPage {
+  title: _("Now Playing");
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      title-widget: Adw.WindowTitle window_title {
+        title: _("Now Playing");
+      };
+    }
+
+    content: Box {
+      orientation: vertical;
+      margin-start: 24;
+      margin-end: 24;
+      margin-top: 12;
+      margin-bottom: 24;
+      spacing: 18;
+
+      ScrolledWindow {
+        vexpand: true;
+
+        TextView player_text_view {
+          editable: false;
+          cursor-visible: false;
+          wrap-mode: word_char;
+          pixels-above-lines: 4;
+          pixels-below-lines: 4;
+          pixels-inside-wrap: 4;
+          left-margin: 8;
+          right-margin: 8;
+
+          styles [
+            "parrot-text",
+          ]
+        }
+      }
+
+      Box {
+        orientation: vertical;
+        spacing: 12;
+
+        Box {
+          orientation: horizontal;
+          spacing: 8;
+
+          Label position_label {
+            label: "0:00";
+            width-chars: 4;
+            xalign: 0;
+          }
+
+          Scale seek_bar {
+            orientation: horizontal;
+            draw-value: false;
+            hexpand: true;
+
+            adjustment: Adjustment {
+              lower: 0;
+              upper: 100;
+              value: 0;
+            };
+          }
+
+          Label duration_label {
+            label: "0:00";
+            width-chars: 4;
+            xalign: 1;
+          }
+        }
+
+        Box {
+          halign: center;
+          spacing: 12;
+
+          Button rewind_button {
+            icon-name: "skip-backwards-10-symbolic";
+            tooltip-text: _("Rewind 10 seconds");
+
+            styles [
+              "flat",
+              "circular",
+            ]
+          }
+
+          Button play_pause_button {
+            icon-name: "media-playback-start-symbolic";
+
+            styles [
+              "circular",
+              "suggested-action",
+            ]
+          }
+
+          Button forward_button {
+            icon-name: "skip-forward-10-symbolic";
+            tooltip-text: _("Forward 10 seconds");
+
+            styles [
+              "flat",
+              "circular",
+            ]
+          }
+        }
+      }
+    };
+  };
+}

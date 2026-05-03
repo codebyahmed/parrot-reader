@@ -2,7 +2,6 @@ using Gtk 4.0;
 using Adw 1;
 
 template $ParrotReaderWindow: Adw.ApplicationWindow {
-  title: _("Parrot");
   default-width: 800;
   default-height: 600;
 
@@ -10,67 +9,74 @@ template $ParrotReaderWindow: Adw.ApplicationWindow {
     "view",
   ]
 
-  content: Adw.ToolbarView {
-    [top]
-    Adw.HeaderBar {
-      [start]
-      Button voice_selector_button {
-        tooltip-text: _("Select Voice");
+  content: Adw.NavigationView navigation_view {
+    Adw.NavigationPage {
+      title: _("Parrot");
+      tag: "home";
 
-        Adw.ButtonContent voice_selector_content {
-          icon-name: "sound-symbolic";
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          [start]
+          Button voice_selector_button {
+            tooltip-text: _("Select Voice");
+
+            Adw.ButtonContent voice_selector_content {
+              icon-name: "sound-symbolic";
+            }
+          }
+
+          [end]
+          MenuButton {
+            primary: true;
+            icon-name: "open-menu-symbolic";
+            tooltip-text: _("Main Menu");
+            menu-model: primary_menu;
+          }
         }
-      }
 
-      [end]
-      MenuButton {
-        primary: true;
-        icon-name: "open-menu-symbolic";
-        tooltip-text: _("Main Menu");
-        menu-model: primary_menu;
-      }
+        content: Adw.ToastOverlay toast_overlay {
+          Box {
+            orientation: vertical;
+
+            ScrolledWindow {
+              hexpand: true;
+              vexpand: true;
+
+              TextView text_view {
+                bottom-margin: 12;
+                left-margin: 24;
+                right-margin: 24;
+                top-margin: 12;
+                pixels-above-lines: 4;
+                pixels-below-lines: 4;
+                pixels-inside-wrap: 4;
+                wrap-mode: word_char;
+
+                styles [
+                  "parrot-text",
+                ]
+              }
+            }
+
+            Box {
+              halign: center;
+              margin-top: 18;
+              margin-bottom: 24;
+
+              Button start_listening_button {
+                label: _("Start Listening");
+
+                styles [
+                  "suggested-action",
+                  "pill",
+                ]
+              }
+            }
+          }
+        };
+      };
     }
-
-    content: Adw.ToastOverlay toast_overlay {
-      Box {
-        orientation: vertical;
-
-        ScrolledWindow {
-          hexpand: true;
-          vexpand: true;
-
-          TextView text_view {
-            bottom-margin: 12;
-            left-margin: 24;
-            right-margin: 24;
-            top-margin: 12;
-            pixels-above-lines: 4;
-            pixels-below-lines: 4;
-            pixels-inside-wrap: 4;
-            wrap-mode: word_char;
-
-            styles [
-              "parrot-text",
-            ]
-          }
-        }
-
-        Box {
-          halign: center;
-          margin-top: 18;
-          margin-bottom: 24;
-
-          Button start_listening_button {
-            label: _("Start Listening");
-
-            styles [
-              "suggested-action",
-              "pill",
-            ]
-          }
-        }
-      }
-    };
   };
 }
 
