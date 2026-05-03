@@ -72,37 +72,82 @@ template $TtsPlayer: Adw.NavigationPage {
           }
         }
 
-        Box {
-          halign: center;
-          spacing: 12;
+        CenterBox {
+          [start]
+          Box {
+            spacing: 4;
 
-          Button rewind_button {
-            icon-name: "skip-backwards-10-symbolic";
-            tooltip-text: _("Rewind 10 seconds");
+            MenuButton volume_button {
+              icon-name: "speaker-3-symbolic";
+              tooltip-text: _("Volume");
 
-            styles [
-              "flat",
-              "circular",
-            ]
+              styles [
+                "flat",
+                "circular",
+              ]
+
+              popover: Popover {
+                Scale volume_scale {
+                  orientation: vertical;
+                  inverted: true;
+                  draw-value: false;
+                  height-request: 100;
+
+                  adjustment: Adjustment {
+                    lower: 0;
+                    upper: 1;
+                    value: 1;
+                    step-increment: 0.05;
+                  };
+                }
+              };
+            }
+
+            Button speed_button {
+              label: "1×";
+              tooltip-text: _("Playback Speed");
+              width-request: 56;
+
+              styles [
+                "flat",
+                "circular",
+              ]
+            }
           }
 
-          Button play_pause_button {
-            icon-name: "media-playback-start-symbolic";
+          [center]
+          Box {
+            halign: center;
+            spacing: 12;
 
-            styles [
-              "circular",
-              "suggested-action",
-            ]
-          }
+            Button rewind_button {
+              icon-name: "skip-backwards-10-symbolic";
+              tooltip-text: _("Rewind 10 seconds");
 
-          Button forward_button {
-            icon-name: "skip-forward-10-symbolic";
-            tooltip-text: _("Forward 10 seconds");
+              styles [
+                "flat",
+                "circular",
+              ]
+            }
 
-            styles [
-              "flat",
-              "circular",
-            ]
+            Button play_pause_button {
+              icon-name: "media-playback-start-symbolic";
+
+              styles [
+                "circular",
+                "suggested-action",
+              ]
+            }
+
+            Button forward_button {
+              icon-name: "skip-forward-10-symbolic";
+              tooltip-text: _("Forward 10 seconds");
+
+              styles [
+                "flat",
+                "circular",
+              ]
+            }
           }
         }
       }

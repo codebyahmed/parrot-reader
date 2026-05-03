@@ -11,5 +11,9 @@
     <file preprocess="xml-stripblanks" alias="sound-symbolic.svg">../data/icons/scalable/actions/sound-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="skip-backwards-10-symbolic.svg">../data/icons/scalable/actions/skip-backwards-10-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="skip-forward-10-symbolic.svg">../data/icons/scalable/actions/skip-forward-10-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="speaker-0-symbolic.svg">../data/icons/scalable/actions/speaker-0-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="speaker-1-symbolic.svg">../data/icons/scalable/actions/speaker-1-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="speaker-2-symbolic.svg">../data/icons/scalable/actions/speaker-2-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="speaker-3-symbolic.svg">../data/icons/scalable/actions/speaker-3-symbolic.svg</file>
   </gresource>
 </gresources>
