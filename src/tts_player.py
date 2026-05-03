@@ -18,9 +18,11 @@ class TtsPlayer(Adw.NavigationPage):
     play_pause_button = Gtk.Template.Child()
     rewind_button = Gtk.Template.Child()
     forward_button = Gtk.Template.Child()
+    speed_button = Gtk.Template.Child()
     window_title = Gtk.Template.Child()
 
     _SKIP_NS = 10 * Gst.SECOND
+    _SPEEDS = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0]
 
     def __init__(self, text: str, voice_id: str, **kwargs):
         super().__init__(**kwargs)
@@ -28,14 +30,17 @@ class TtsPlayer(Adw.NavigationPage):
         self._pipeline = None
         self._position_timer = None
         self._seek_updating = False
+        self._speed_idx = 2  # default 1.0×
 
         self.player_text_view.get_buffer().set_text(text)
         self.play_pause_button.set_sensitive(False)
         self.rewind_button.set_sensitive(False)
         self.forward_button.set_sensitive(False)
+        self.speed_button.set_sensitive(False)
         self.play_pause_button.connect('clicked', self._on_play_pause_clicked)
         self.rewind_button.connect('clicked', self._on_rewind_clicked)
         self.forward_button.connect('clicked', self._on_forward_clicked)
+        self.speed_button.connect('clicked', self._on_speed_clicked)
         self.seek_bar.connect('value-changed', self._on_seek_changed)
         self.connect('hiding', self._on_hiding)
 
@@ -48,6 +53,9 @@ class TtsPlayer(Adw.NavigationPage):
         if path:
             self._pipeline = Gst.ElementFactory.make('playbin3', 'player')
             self._pipeline.set_property('uri', Gst.filename_to_uri(path))
+            scaletempo = Gst.ElementFactory.make('scaletempo', None)
+            if scaletempo:
+                self._pipeline.set_property('audio-filter', scaletempo)
             bus = self._pipeline.get_bus()
             bus.add_signal_watch()
             bus.connect('message::eos', self._on_eos)
@@ -57,6 +65,7 @@ class TtsPlayer(Adw.NavigationPage):
             self.play_pause_button.set_sensitive(True)
             self.rewind_button.set_sensitive(True)
             self.forward_button.set_sensitive(True)
+            self.speed_button.set_sensitive(True)
         return False
 
     def _on_async_done(self, _bus, _msg):
@@ -72,7 +81,7 @@ class TtsPlayer(Adw.NavigationPage):
         if ok and ok_dur:
             new_pos = max(0, min(pos + delta_ns, dur))
             self._pipeline.seek(
-                1.0,
+                self._SPEEDS[self._speed_idx],
                 Gst.Format.TIME,
                 Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
                 Gst.SeekType.SET,
@@ -90,6 +99,27 @@ class TtsPlayer(Adw.NavigationPage):
 
     def _on_forward_clicked(self, _button):
         self._skip(self._SKIP_NS)
+
+    def _on_speed_clicked(self, _button):
+        self._speed_idx = (self._speed_idx + 1) % len(self._SPEEDS)
+        rate = self._SPEEDS[self._speed_idx]
+        self.speed_button.set_label(f'{rate:g}×')
+        if not self._pipeline:
+            return
+        ok, pos = self._pipeline.query_position(Gst.Format.TIME)
+        if not ok:
+            pos = 0
+        _, state, _ = self._pipeline.get_state(0)
+        if state in (Gst.State.PLAYING, Gst.State.PAUSED):
+            self._pipeline.seek(
+                rate,
+                Gst.Format.TIME,
+                Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
+                Gst.SeekType.SET,
+                pos,
+                Gst.SeekType.NONE,
+                0,
+            )
 
     def _on_play_pause_clicked(self, _button):
         if not self._pipeline:
@@ -130,7 +160,7 @@ class TtsPlayer(Adw.NavigationPage):
             pos = int((scale.get_value() / 100) * dur)
             self.position_label.set_label(self._fmt(pos))
             self._pipeline.seek(
-                1.0,
+                self._SPEEDS[self._speed_idx],
                 Gst.Format.TIME,
                 Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
                 Gst.SeekType.SET,

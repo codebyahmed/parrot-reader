@@ -72,13 +72,11 @@ template $TtsPlayer: Adw.NavigationPage {
           }
         }
 
-        Box {
-          halign: center;
-          spacing: 12;
-
-          Button rewind_button {
-            icon-name: "skip-backwards-10-symbolic";
-            tooltip-text: _("Rewind 10 seconds");
+        CenterBox {
+          [start]
+          Button speed_button {
+            label: "1×";
+            tooltip-text: _("Playback Speed");
 
             styles [
               "flat",
@@ -86,23 +84,39 @@ template $TtsPlayer: Adw.NavigationPage {
             ]
           }
 
-          Button play_pause_button {
-            icon-name: "media-playback-start-symbolic";
+          [center]
+          Box {
+            halign: center;
+            spacing: 12;
 
-            styles [
-              "circular",
-              "suggested-action",
-            ]
-          }
+            Button rewind_button {
+              icon-name: "skip-backwards-10-symbolic";
+              tooltip-text: _("Rewind 10 seconds");
 
-          Button forward_button {
-            icon-name: "skip-forward-10-symbolic";
-            tooltip-text: _("Forward 10 seconds");
+              styles [
+                "flat",
+                "circular",
+              ]
+            }
 
-            styles [
-              "flat",
-              "circular",
-            ]
+            Button play_pause_button {
+              icon-name: "media-playback-start-symbolic";
+
+              styles [
+                "circular",
+                "suggested-action",
+              ]
+            }
+
+            Button forward_button {
+              icon-name: "skip-forward-10-symbolic";
+              tooltip-text: _("Forward 10 seconds");
+
+              styles [
+                "flat",
+                "circular",
+              ]
+            }
           }
         }
       }
