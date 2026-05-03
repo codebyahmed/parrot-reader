@@ -19,6 +19,8 @@ class TtsPlayer(Adw.NavigationPage):
     rewind_button = Gtk.Template.Child()
     forward_button = Gtk.Template.Child()
     speed_button = Gtk.Template.Child()
+    volume_button = Gtk.Template.Child()
+    volume_scale = Gtk.Template.Child()
     window_title = Gtk.Template.Child()
 
     _SKIP_NS = 10 * Gst.SECOND
@@ -37,10 +39,12 @@ class TtsPlayer(Adw.NavigationPage):
         self.rewind_button.set_sensitive(False)
         self.forward_button.set_sensitive(False)
         self.speed_button.set_sensitive(False)
+        self.volume_button.set_sensitive(False)
         self.play_pause_button.connect('clicked', self._on_play_pause_clicked)
         self.rewind_button.connect('clicked', self._on_rewind_clicked)
         self.forward_button.connect('clicked', self._on_forward_clicked)
         self.speed_button.connect('clicked', self._on_speed_clicked)
+        self.volume_scale.connect('value-changed', self._on_volume_changed)
         self.seek_bar.connect('value-changed', self._on_seek_changed)
         self.connect('hiding', self._on_hiding)
 
@@ -66,6 +70,8 @@ class TtsPlayer(Adw.NavigationPage):
             self.rewind_button.set_sensitive(True)
             self.forward_button.set_sensitive(True)
             self.speed_button.set_sensitive(True)
+            self.volume_button.set_sensitive(True)
+            self._pipeline.set_property('volume', self.volume_scale.get_value())
         return False
 
     def _on_async_done(self, _bus, _msg):
@@ -120,6 +126,20 @@ class TtsPlayer(Adw.NavigationPage):
                 Gst.SeekType.NONE,
                 0,
             )
+
+    def _on_volume_changed(self, scale):
+        value = scale.get_value()
+        if value == 0:
+            icon = 'speaker-0-symbolic'
+        elif value < 0.34:
+            icon = 'speaker-1-symbolic'
+        elif value < 0.67:
+            icon = 'speaker-2-symbolic'
+        else:
+            icon = 'speaker-3-symbolic'
+        self.volume_button.set_icon_name(icon)
+        if self._pipeline:
+            self._pipeline.set_property('volume', value)
 
     def _on_play_pause_clicked(self, _button):
         if not self._pipeline:

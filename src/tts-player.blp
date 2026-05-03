@@ -74,14 +74,45 @@ template $TtsPlayer: Adw.NavigationPage {
 
         CenterBox {
           [start]
-          Button speed_button {
-            label: "1×";
-            tooltip-text: _("Playback Speed");
+          Box {
+            spacing: 4;
 
-            styles [
-              "flat",
-              "circular",
-            ]
+            MenuButton volume_button {
+              icon-name: "speaker-3-symbolic";
+              tooltip-text: _("Volume");
+
+              styles [
+                "flat",
+                "circular",
+              ]
+
+              popover: Popover {
+                Scale volume_scale {
+                  orientation: vertical;
+                  inverted: true;
+                  draw-value: false;
+                  height-request: 100;
+
+                  adjustment: Adjustment {
+                    lower: 0;
+                    upper: 1;
+                    value: 1;
+                    step-increment: 0.05;
+                  };
+                }
+              };
+            }
+
+            Button speed_button {
+              label: "1×";
+              tooltip-text: _("Playback Speed");
+              width-request: 56;
+
+              styles [
+                "flat",
+                "circular",
+              ]
+            }
           }
 
           [center]
