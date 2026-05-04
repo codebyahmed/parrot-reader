@@ -1,4 +1,7 @@
 import gi
+import shutil
+import threading
+import re
 gi.require_version('Gst', '1.0')
 
 from gi.repository import Adw, Gtk, GLib, Gst
@@ -21,6 +24,7 @@ class TtsPlayer(Adw.NavigationPage):
     speed_button = Gtk.Template.Child()
     volume_button = Gtk.Template.Child()
     volume_scale = Gtk.Template.Child()
+    export_button = Gtk.Template.Child()
     window_title = Gtk.Template.Child()
 
     _SKIP_NS = 10 * Gst.SECOND
@@ -30,6 +34,8 @@ class TtsPlayer(Adw.NavigationPage):
         super().__init__(**kwargs)
         self.window_title.set_subtitle(f'{get_voice_name(voice_id)} • {get_voice_language(voice_id)}')
         self._pipeline = None
+        self._audio_path = None
+        self._export_name = self._make_export_name(text)
         self._position_timer = None
         self._seek_updating = False
         self._speed_idx = 2  # default 1.0×
@@ -40,6 +46,7 @@ class TtsPlayer(Adw.NavigationPage):
         self.forward_button.set_sensitive(False)
         self.speed_button.set_sensitive(False)
         self.volume_button.set_sensitive(False)
+        self.export_button.connect('clicked', self._on_export_clicked)
         self.play_pause_button.connect('clicked', self._on_play_pause_clicked)
         self.rewind_button.connect('clicked', self._on_rewind_clicked)
         self.forward_button.connect('clicked', self._on_forward_clicked)
@@ -49,12 +56,20 @@ class TtsPlayer(Adw.NavigationPage):
         self.connect('hiding', self._on_hiding)
 
     @staticmethod
+    def _make_export_name(text: str) -> str:
+        words = text.split()[:5]
+        cleaned = (re.sub(r'[^\w]', '', w).lower() for w in words if w)
+        slug = ' '.join(cleaned)
+        return (slug[:48] or 'speech') + '.wav'
+
+    @staticmethod
     def _fmt(ns):
         s = ns // Gst.SECOND
         return f'{s // 60}:{s % 60:02d}'
 
     def on_synthesis_done(self, path, _error):
         if path:
+            self._audio_path = path
             self._pipeline = Gst.ElementFactory.make('playbin3', 'player')
             self._pipeline.set_property('uri', Gst.filename_to_uri(path))
             scaletempo = Gst.ElementFactory.make('scaletempo', None)
@@ -71,6 +86,7 @@ class TtsPlayer(Adw.NavigationPage):
             self.forward_button.set_sensitive(True)
             self.speed_button.set_sensitive(True)
             self.volume_button.set_sensitive(True)
+            self.export_button.set_sensitive(True)
             self._pipeline.set_property('volume', self.volume_scale.get_value())
         return False
 
@@ -126,6 +142,26 @@ class TtsPlayer(Adw.NavigationPage):
                 Gst.SeekType.NONE,
                 0,
             )
+
+    def _on_export_clicked(self, _button):
+        dialog = Gtk.FileDialog()
+        dialog.set_title('Export Speech')
+        dialog.set_initial_name(self._export_name)
+        dialog.save(self.get_root(), None, self._on_export_response)
+
+    def _on_export_response(self, dialog, result):
+        try:
+            file = dialog.save_finish(result)
+        except GLib.Error:
+            return
+        dest = file.get_path()
+        if not dest:
+            return
+        threading.Thread(
+            target=shutil.copy2,
+            args=(self._audio_path, dest),
+            daemon=True,
+        ).start()
 
     def _on_volume_changed(self, scale):
         value = scale.get_value()
