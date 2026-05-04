@@ -32,10 +32,11 @@ class TtsPlayer(Adw.NavigationPage):
 
     def __init__(self, text: str, voice_id: str, **kwargs):
         super().__init__(**kwargs)
+        title = self._title_from_text(text)
+        self.window_title.set_title(title)
         self.window_title.set_subtitle(f'{get_voice_name(voice_id)} • {get_voice_language(voice_id)}')
         self._pipeline = None
         self._audio_path = None
-        self._export_name = self._make_export_name(text)
         self._position_timer = None
         self._seek_updating = False
         self._speed_idx = 2  # default 1.0×
@@ -56,11 +57,11 @@ class TtsPlayer(Adw.NavigationPage):
         self.connect('hiding', self._on_hiding)
 
     @staticmethod
-    def _make_export_name(text: str) -> str:
+    def _title_from_text(text: str) -> str:
         words = text.split()[:5]
-        cleaned = (re.sub(r'[^\w]', '', w).lower() for w in words if w)
-        slug = ' '.join(cleaned)
-        return (slug[:48] or 'speech') + '.wav'
+        cleaned = (re.sub(r'[^\w]', '', w) for w in words if w)
+        slug = ' '.join(w for w in cleaned if w)
+        return (slug[:48] or 'Speech').capitalize()
 
     @staticmethod
     def _fmt(ns):
@@ -146,7 +147,7 @@ class TtsPlayer(Adw.NavigationPage):
     def _on_export_clicked(self, _button):
         dialog = Gtk.FileDialog()
         dialog.set_title('Export Speech')
-        dialog.set_initial_name(self._export_name)
+        dialog.set_initial_name(self.window_title.get_title() + '.wav')
         dialog.save(self.get_root(), None, self._on_export_response)
 
     def _on_export_response(self, dialog, result):
