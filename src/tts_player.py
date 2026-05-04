@@ -185,14 +185,14 @@ class TtsPlayer(Adw.NavigationPage):
         _, state, _ = self._pipeline.get_state(0)
         if state == Gst.State.PLAYING:
             self._pipeline.set_state(Gst.State.PAUSED)
-            self.play_pause_button.set_icon_name('media-playback-start-symbolic')
+            self.play_pause_button.set_icon_name('play-symbolic')
             self.play_pause_button.set_tooltip_text('Play')
             if self._position_timer:
                 GLib.source_remove(self._position_timer)
                 self._position_timer = None
         else:
             self._pipeline.set_state(Gst.State.PLAYING)
-            self.play_pause_button.set_icon_name('media-playback-pause-symbolic')
+            self.play_pause_button.set_icon_name('pause-symbolic')
             self.play_pause_button.set_tooltip_text('Pause')
             self._position_timer = GLib.timeout_add(200, self._update_seek_bar)
 
@@ -243,7 +243,7 @@ class TtsPlayer(Adw.NavigationPage):
             0,
         )
         self._pipeline.set_state(Gst.State.PAUSED)
-        self.play_pause_button.set_icon_name('media-playback-start-symbolic')
+        self.play_pause_button.set_icon_name('play-symbolic')
         self.play_pause_button.set_tooltip_text('Play')
         self._seek_updating = True
         self.seek_bar.set_value(0)
