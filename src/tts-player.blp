@@ -88,6 +88,7 @@ template $TtsPlayer: Adw.NavigationPage {
             MenuButton volume_button {
               icon-name: "speaker-3-symbolic";
               tooltip-text: _("Volume");
+              valign: center;
 
               styles [
                 "flat",
@@ -115,6 +116,7 @@ template $TtsPlayer: Adw.NavigationPage {
               label: "1×";
               tooltip-text: _("Playback Speed");
               width-request: 56;
+              valign: center;
 
               styles [
                 "flat",
@@ -128,6 +130,7 @@ template $TtsPlayer: Adw.NavigationPage {
             icon-name: "document-save-symbolic";
             tooltip-text: _("Export");
             sensitive: false;
+            valign: center;
 
             styles [
               "flat",
@@ -143,6 +146,7 @@ template $TtsPlayer: Adw.NavigationPage {
             Button rewind_button {
               icon-name: "skip-backwards-10-symbolic";
               tooltip-text: _("Rewind 10 seconds");
+              valign: center;
 
               styles [
                 "flat",
@@ -152,16 +156,18 @@ template $TtsPlayer: Adw.NavigationPage {
 
             Button play_pause_button {
               icon-name: "play-symbolic";
+              width-request: 48;
+              height-request: 48;
 
               styles [
                 "circular",
-                "suggested-action",
               ]
             }
 
             Button forward_button {
               icon-name: "skip-forward-10-symbolic";
               tooltip-text: _("Forward 10 seconds");
+              valign: center;
 
               styles [
                 "flat",
