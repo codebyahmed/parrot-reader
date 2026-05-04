@@ -115,6 +115,18 @@ template $TtsPlayer: Adw.NavigationPage {
             }
           }
 
+          [end]
+          Button export_button {
+            icon-name: "document-save-symbolic";
+            tooltip-text: _("Export");
+            sensitive: false;
+
+            styles [
+              "flat",
+              "circular",
+            ]
+          }
+
           [center]
           Box {
             halign: center;
