@@ -15,5 +15,6 @@
     <file preprocess="xml-stripblanks" alias="speaker-1-symbolic.svg">../data/icons/scalable/actions/speaker-1-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="speaker-2-symbolic.svg">../data/icons/scalable/actions/speaker-2-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="speaker-3-symbolic.svg">../data/icons/scalable/actions/speaker-3-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="document-save-symbolic.svg">../data/icons/scalable/actions/document-save-symbolic.svg</file>
   </gresource>
 </gresources>
