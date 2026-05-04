@@ -24,6 +24,8 @@ class TtsPlayer(Adw.NavigationPage):
     speed_button = Gtk.Template.Child()
     volume_button = Gtk.Template.Child()
     volume_scale = Gtk.Template.Child()
+    volume_up_button = Gtk.Template.Child()
+    volume_down_button = Gtk.Template.Child()
     export_button = Gtk.Template.Child()
     window_title = Gtk.Template.Child()
 
@@ -40,6 +42,7 @@ class TtsPlayer(Adw.NavigationPage):
         self._position_timer = None
         self._seek_updating = False
         self._speed_idx = 2  # default 1.0×
+        self._volume_step = self.volume_scale.get_adjustment().get_step_increment()
 
         self.player_text_view.get_buffer().set_text(text)
         self.play_pause_button.set_sensitive(False)
@@ -53,6 +56,8 @@ class TtsPlayer(Adw.NavigationPage):
         self.forward_button.connect('clicked', self._on_forward_clicked)
         self.speed_button.connect('clicked', self._on_speed_clicked)
         self.volume_scale.connect('value-changed', self._on_volume_changed)
+        self.volume_up_button.connect('clicked', self._on_volume_up_clicked)
+        self.volume_down_button.connect('clicked', self._on_volume_down_clicked)
         self.seek_bar.connect('value-changed', self._on_seek_changed)
         self.connect('hiding', self._on_hiding)
 
@@ -165,13 +170,23 @@ class TtsPlayer(Adw.NavigationPage):
             daemon=True,
         ).start()
 
+    def _on_volume_up_clicked(self, _button):
+        current_value = self.volume_scale.get_value()
+        self.volume_scale.set_value(min(1.0, current_value + self._volume_step))
+
+    def _on_volume_down_clicked(self, _button):
+        current_value = self.volume_scale.get_value()
+        self.volume_scale.set_value(max(0.0, current_value - self._volume_step))
+
     def _on_volume_changed(self, scale):
         value = scale.get_value()
+        self.volume_up_button.set_sensitive(value < 1.0)
+        self.volume_down_button.set_sensitive(value > 0.0)
         if value == 0:
             icon = 'speaker-0-symbolic'
-        elif value < 0.34:
+        elif value < 0.5:
             icon = 'speaker-1-symbolic'
-        elif value < 0.67:
+        elif value < 1.0:
             icon = 'speaker-2-symbolic'
         else:
             icon = 'speaker-3-symbolic'
