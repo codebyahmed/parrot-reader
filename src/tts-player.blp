@@ -10,6 +10,14 @@ template $TtsPlayer: Adw.NavigationPage {
       title-widget: Adw.WindowTitle window_title {
         title: _("Now Playing");
       };
+
+      [end]
+      MenuButton {
+        primary: true;
+        icon-name: "open-menu-symbolic";
+        tooltip-text: _("Main Menu");
+        menu-model: primary_menu;
+      }
     }
 
     content: Box {
@@ -165,4 +173,23 @@ template $TtsPlayer: Adw.NavigationPage {
       }
     };
   };
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "app.shortcuts";
+    }
+
+    item {
+      label: _("_About Parrot");
+      action: "app.about";
+    }
+  }
 }
