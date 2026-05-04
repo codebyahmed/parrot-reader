@@ -83,6 +83,7 @@ class TtsPlayer(Adw.NavigationPage):
             bus.connect('message::async-done', self._on_async_done)
             self._pipeline.set_state(Gst.State.PAUSED)
             self.play_pause_button.set_sensitive(True)
+            self.play_pause_button.set_tooltip_text('Play')
             self.rewind_button.set_sensitive(True)
             self.forward_button.set_sensitive(True)
             self.speed_button.set_sensitive(True)
@@ -185,12 +186,14 @@ class TtsPlayer(Adw.NavigationPage):
         if state == Gst.State.PLAYING:
             self._pipeline.set_state(Gst.State.PAUSED)
             self.play_pause_button.set_icon_name('media-playback-start-symbolic')
+            self.play_pause_button.set_tooltip_text('Play')
             if self._position_timer:
                 GLib.source_remove(self._position_timer)
                 self._position_timer = None
         else:
             self._pipeline.set_state(Gst.State.PLAYING)
             self.play_pause_button.set_icon_name('media-playback-pause-symbolic')
+            self.play_pause_button.set_tooltip_text('Pause')
             self._position_timer = GLib.timeout_add(200, self._update_seek_bar)
 
     def _update_seek_bar(self):
@@ -241,6 +244,7 @@ class TtsPlayer(Adw.NavigationPage):
         )
         self._pipeline.set_state(Gst.State.PAUSED)
         self.play_pause_button.set_icon_name('media-playback-start-symbolic')
+        self.play_pause_button.set_tooltip_text('Play')
         self._seek_updating = True
         self.seek_bar.set_value(0)
         self._seek_updating = False
