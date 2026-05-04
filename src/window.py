@@ -19,11 +19,11 @@
 
 import os
 import threading
-from datetime import datetime
 
 from gi.repository import Adw, Gtk, Gio, GLib
 from .voice_dialog import VoiceDialog, get_voice_name
 from .tts_player import TtsPlayer
+from .tts import synthesize
 
 
 @Gtk.Template(resource_path='/dev/ahmediqbal/parrot/window.ui')
@@ -67,9 +67,8 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         if not text.strip():
             return
 
-        out_dir = os.path.join(GLib.get_user_data_dir(), 'recordings')
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        out_path = os.path.join(out_dir, f'audio_{timestamp}.wav')
+        out_dir = os.path.join(GLib.get_user_cache_dir(), 'parrot-reader')
+        out_path = os.path.join(out_dir, 'current.wav')
 
         tts_player = TtsPlayer(text=text, voice_id=self.current_voice_id)
         self.navigation_view.push(tts_player)
@@ -81,7 +80,6 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         ).start()
 
     def _run_synthesis(self, text, voice, out_path, tts_player):
-        from .tts import synthesize
         try:
             path = synthesize(text, voice, out_path)
             GLib.idle_add(tts_player.on_synthesis_done, path, None)
