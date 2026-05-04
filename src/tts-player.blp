@@ -10,6 +10,14 @@ template $TtsPlayer: Adw.NavigationPage {
       title-widget: Adw.WindowTitle window_title {
         title: _("Now Playing");
       };
+
+      [end]
+      MenuButton {
+        primary: true;
+        icon-name: "open-menu-symbolic";
+        tooltip-text: _("Main Menu");
+        menu-model: primary_menu;
+      }
     }
 
     content: Box {
@@ -80,6 +88,7 @@ template $TtsPlayer: Adw.NavigationPage {
             MenuButton volume_button {
               icon-name: "speaker-3-symbolic";
               tooltip-text: _("Volume");
+              valign: center;
 
               styles [
                 "flat",
@@ -87,18 +96,47 @@ template $TtsPlayer: Adw.NavigationPage {
               ]
 
               popover: Popover {
-                Scale volume_scale {
+                Box {
                   orientation: vertical;
-                  inverted: true;
-                  draw-value: false;
-                  height-request: 100;
+                  spacing: 2;
+                  margin-top: 3;
+                  margin-bottom: 3;
 
-                  adjustment: Adjustment {
-                    lower: 0;
-                    upper: 1;
-                    value: 1;
-                    step-increment: 0.05;
-                  };
+                  Button volume_up_button {
+                    icon-name: "value-increase-symbolic";
+                    tooltip-text: _("Increase Volume");
+                    halign: center;
+
+                    styles [
+                      "flat",
+                      "circular",
+                    ]
+                  }
+
+                  Scale volume_scale {
+                    orientation: vertical;
+                    inverted: true;
+                    draw-value: false;
+                    height-request: 100;
+
+                    adjustment: Adjustment {
+                      lower: 0;
+                      upper: 1;
+                      value: 1;
+                      step-increment: 0.1;
+                    };
+                  }
+
+                  Button volume_down_button {
+                    icon-name: "value-decrease-symbolic";
+                    tooltip-text: _("Decrease Volume");
+                    halign: center;
+
+                    styles [
+                      "flat",
+                      "circular",
+                    ]
+                  }
                 }
               };
             }
@@ -107,6 +145,7 @@ template $TtsPlayer: Adw.NavigationPage {
               label: "1×";
               tooltip-text: _("Playback Speed");
               width-request: 56;
+              valign: center;
 
               styles [
                 "flat",
@@ -120,6 +159,7 @@ template $TtsPlayer: Adw.NavigationPage {
             icon-name: "document-save-symbolic";
             tooltip-text: _("Export");
             sensitive: false;
+            valign: center;
 
             styles [
               "flat",
@@ -135,6 +175,7 @@ template $TtsPlayer: Adw.NavigationPage {
             Button rewind_button {
               icon-name: "skip-backwards-10-symbolic";
               tooltip-text: _("Rewind 10 seconds");
+              valign: center;
 
               styles [
                 "flat",
@@ -143,17 +184,19 @@ template $TtsPlayer: Adw.NavigationPage {
             }
 
             Button play_pause_button {
-              icon-name: "media-playback-start-symbolic";
+              icon-name: "play-symbolic";
+              width-request: 48;
+              height-request: 48;
 
               styles [
                 "circular",
-                "suggested-action",
               ]
             }
 
             Button forward_button {
               icon-name: "skip-forward-10-symbolic";
               tooltip-text: _("Forward 10 seconds");
+              valign: center;
 
               styles [
                 "flat",
@@ -165,4 +208,23 @@ template $TtsPlayer: Adw.NavigationPage {
       }
     };
   };
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "app.shortcuts";
+    }
+
+    item {
+      label: _("_About Parrot");
+      action: "app.about";
+    }
+  }
 }
