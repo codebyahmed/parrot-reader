@@ -19,16 +19,29 @@ template $LoadingPage: Adw.NavigationPage {
 
       Spinner {
         spinning: true;
-        width-request: 32;
-        height-request: 32;
+        width-request: 48;
+        height-request: 48;
       }
 
-      Label {
-        label: _("Generating audio…");
+      Box {
+        orientation: vertical;
+        spacing: 6;
 
-        styles [
-          "dim-label",
-        ]
+        Label {
+          label: _("Generating audio…");
+
+          styles [
+            "title-4",
+          ]
+        }
+
+        Label {
+          label: _("This may take a moment for long texts");
+
+          styles [
+            "dim-label",
+          ]
+        }
       }
     };
   };
