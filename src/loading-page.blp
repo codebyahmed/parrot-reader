@@ -2,14 +2,12 @@ using Gtk 4.0;
 using Adw 1;
 
 template $LoadingPage: Adw.NavigationPage {
-  title: _("Generating");
+  title: _("Generating Audio");
   can-pop: false;
 
   child: Adw.ToolbarView {
     [top]
-    Adw.HeaderBar {
-      show-title: false;
-    }
+    Adw.HeaderBar {}
 
     content: Box {
       orientation: vertical;
@@ -27,17 +25,13 @@ template $LoadingPage: Adw.NavigationPage {
         orientation: vertical;
         spacing: 6;
 
-        Label {
-          label: _("Generating audio…");
-
+        Label audio_title_label {
           styles [
             "title-4",
           ]
         }
 
-        Label {
-          label: _("This may take a moment for long texts");
-
+        Label voice_label {
           styles [
             "dim-label",
           ]

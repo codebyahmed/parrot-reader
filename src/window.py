@@ -72,7 +72,10 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         out_path = os.path.join(out_dir, 'current.wav')
 
         tts_player = TtsPlayer(text=text, voice_id=self.current_voice_id)
-        loading_page = LoadingPage()
+        loading_page = LoadingPage(
+            audio_title=tts_player.window_title.get_title(),
+            voice_info=tts_player.window_title.get_subtitle(),
+        )
         self.navigation_view.push(loading_page)
 
         def on_progress(fraction):
