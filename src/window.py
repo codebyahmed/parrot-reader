@@ -75,8 +75,24 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         self._cancel_event = threading.Event()
 
         def on_cancel():
-            self._cancel_event.set()
-            self.navigation_view.pop()
+            dialog = Adw.AlertDialog(
+                heading='Stop Generating?',
+                body='The audio being generated will be discarded.',\
+                close_response='continue',
+                default_response='continue'
+            )
+            dialog.add_response('continue', 'Continue')
+            dialog.add_response('cancel', 'Cancel')
+            dialog.set_response_appearance('cancel', Adw.ResponseAppearance.DESTRUCTIVE)
+
+
+            def on_response(_dialog, response):
+                if response == 'cancel':
+                    self._cancel_event.set()
+                    self.navigation_view.pop()
+
+            dialog.connect('response', on_response)
+            dialog.present(self)
 
         voice_info = f'{get_voice_name(self.current_voice_id)} • {get_voice_language(self.current_voice_id)}'
         loading_page = LoadingPage(
