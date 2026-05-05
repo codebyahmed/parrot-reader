@@ -2,7 +2,7 @@ using Gtk 4.0;
 using Adw 1;
 
 template $LoadingPage: Adw.NavigationPage {
-  title: _("Generating Audio");
+  title: _("Generating audio");
   can-pop: false;
 
   child: Adw.ToolbarView {
@@ -11,7 +11,7 @@ template $LoadingPage: Adw.NavigationPage {
 
     content: Box {
       orientation: vertical;
-      spacing: 18;
+      spacing: 24;
       valign: center;
       halign: center;
 
@@ -49,7 +49,6 @@ template $LoadingPage: Adw.NavigationPage {
         margin-top: 6;
 
         styles [
-          "destructive-action",
           "pill",
         ]
       }
