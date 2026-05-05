@@ -75,15 +75,18 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         loading_page = LoadingPage()
         self.navigation_view.push(loading_page)
 
+        def on_progress(fraction):
+            GLib.idle_add(loading_page.set_progress, fraction)
+
         threading.Thread(
             target=self._run_synthesis,
-            args=(text, self.current_voice_id, out_path, tts_player),
+            args=(text, self.current_voice_id, out_path, tts_player, on_progress),
             daemon=True,
         ).start()
 
-    def _run_synthesis(self, text, voice, out_path, tts_player):
+    def _run_synthesis(self, text, voice, out_path, tts_player, on_progress):
         try:
-            path = synthesize(text, voice, out_path)
+            path = synthesize(text, voice, out_path, on_progress)
             GLib.idle_add(self._on_synthesis_ready, tts_player, path, None)
         except Exception as exc:
             GLib.idle_add(self._on_synthesis_ready, tts_player, None, str(exc))

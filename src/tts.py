@@ -169,19 +169,22 @@ def _trim_silence(audio: np.ndarray, top_db: float = 60.0) -> np.ndarray:
     return trimmed
 
 
-def synthesize(text: str, voice: str, output_path: str) -> str:
+def synthesize(text: str, voice: str, output_path: str, progress_callback=None) -> str:
     g2p = _load_g2p(voice)
     voices = _load_voice(voice)
 
     phonemes, _ = g2p(text)
     batches = _split_phonemes(phonemes)
+    total = len(batches)
 
     waveforms: list[np.ndarray] = []
-    for batch in batches:
+    for i, batch in enumerate(batches):
         ids = _phonemes_to_ids(batch)
         wav = _infer(ids, voices)
         wav = _trim_silence(wav)
         waveforms.append(wav)
+        if progress_callback:
+            progress_callback((i + 1) / total)
 
     audio = np.concatenate(waveforms) if waveforms else np.zeros(0, dtype=np.float32)
 
