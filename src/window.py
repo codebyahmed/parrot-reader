@@ -40,6 +40,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self._cancel_event = None
         self.settings = Gio.Settings(schema_id='dev.ahmediqbal.parrot')
         self.current_voice_id = self.settings.get_string('voice-id')
         self.voice_selector_content.set_label(get_voice_name(self.current_voice_id))
@@ -71,10 +72,17 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         out_dir = os.path.join(GLib.get_user_cache_dir(), 'parrot-reader')
         out_path = os.path.join(out_dir, 'current.wav')
 
+        self._cancel_event = threading.Event()
+
+        def on_cancel():
+            self._cancel_event.set()
+            self.navigation_view.pop()
+
         voice_info = f'{get_voice_name(self.current_voice_id)} • {get_voice_language(self.current_voice_id)}'
         loading_page = LoadingPage(
             audio_title=title_from_text(text),
             voice_info=voice_info,
+            on_cancel=on_cancel,
         )
         self.navigation_view.push(loading_page)
 
@@ -83,18 +91,22 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
 
         threading.Thread(
             target=self._run_synthesis,
-            args=(text, self.current_voice_id, out_path, on_progress),
+            args=(text, self.current_voice_id, out_path, on_progress, self._cancel_event),
             daemon=True,
         ).start()
 
-    def _run_synthesis(self, text, voice_id, out_path, on_progress):
+    def _run_synthesis(self, text, voice_id, out_path, on_progress, cancel_event):
         try:
-            path = synthesize(text, voice_id, out_path, on_progress)
-            GLib.idle_add(self._on_synthesis_ready, text, voice_id, path, None)
+            path = synthesize(text, voice_id, out_path, on_progress, cancel_event)
+            if not cancel_event.is_set():
+                GLib.idle_add(self._on_synthesis_ready, text, voice_id, path, None)
         except Exception as exc:
-            GLib.idle_add(self._on_synthesis_ready, text, voice_id, None, str(exc))
+            if not cancel_event.is_set():
+                GLib.idle_add(self._on_synthesis_ready, text, voice_id, None, str(exc))
 
     def _on_synthesis_ready(self, text, voice_id, path, error):
+        if self._cancel_event.is_set():
+            return False
         tts_player = TtsPlayer(text=text, voice_id=voice_id)
         tts_player.on_synthesis_done(path, error)
         loading_page = self.navigation_view.get_visible_page()
@@ -103,5 +115,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         return False
 
     def _on_loading_hidden(self, _loading_page, tts_player):
+        if self._cancel_event.is_set():
+            return
         home = self.navigation_view.find_page('home')
         self.navigation_view.replace([home, tts_player])

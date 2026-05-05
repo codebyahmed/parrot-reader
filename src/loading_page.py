@@ -8,11 +8,14 @@ class LoadingPage(Adw.NavigationPage):
     progress_bar = Gtk.Template.Child()
     audio_title_label = Gtk.Template.Child()
     voice_label = Gtk.Template.Child()
+    cancel_button = Gtk.Template.Child()
 
-    def __init__(self, audio_title: str = '', voice_info: str = '', **kwargs):
+    def __init__(self, audio_title: str = '', voice_info: str = '', on_cancel=None, **kwargs):
         super().__init__(**kwargs)
         self.audio_title_label.set_label(audio_title)
         self.voice_label.set_label(voice_info)
+        if on_cancel:
+            self.cancel_button.connect('clicked', lambda _: on_cancel())
 
     def set_progress(self, fraction: float):
         self.progress_bar.set_fraction(fraction)

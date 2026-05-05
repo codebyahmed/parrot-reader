@@ -42,6 +42,17 @@ template $LoadingPage: Adw.NavigationPage {
         show-text: false;
         width-request: 240;
       }
+
+      Button cancel_button {
+        label: _("Cancel");
+        halign: center;
+        margin-top: 6;
+
+        styles [
+          "destructive-action",
+          "pill",
+        ]
+      }
     };
   };
 }
