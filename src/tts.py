@@ -9,6 +9,13 @@ from ._config import PKGDATADIR as BASE
 SAMPLE_RATE = 24_000
 MAX_PHONEME_LENGTH = 510
 
+
+def title_from_text(text: str) -> str:
+    words = text.split()[:5]
+    cleaned = (re.sub(r'[^\w]', '', w) for w in words if w)
+    slug = ' '.join(w for w in cleaned if w)
+    return (slug[:48] or 'Speech').capitalize()
+
 _VOCAB: dict[str, int] = {
     "$": 0, ";": 1, ":": 2, ",": 3, ".": 4, "!": 5, "?": 6,
     "—": 9, "…": 10, "\"": 11, "(": 12, ")": 13,
@@ -149,7 +156,7 @@ def _split_phonemes(ph: str) -> list[str]:
     return batches
 
 
-def _infer(ids: list[int], voices: np.ndarray) -> np.ndarray:
+def _infer(ids: list[int], voices: np.ndarray, run_options=None) -> np.ndarray:
     sess = _load_session()
     ref_s = voices[min(len(ids), len(voices) - 1)]
     waveform, _ = sess.run(
@@ -159,6 +166,7 @@ def _infer(ids: list[int], voices: np.ndarray) -> np.ndarray:
             "style": ref_s,
             "speed": np.ones(1, dtype=np.float32),
         },
+        run_options,
     )
     return waveform[0]
 
@@ -169,19 +177,24 @@ def _trim_silence(audio: np.ndarray, top_db: float = 60.0) -> np.ndarray:
     return trimmed
 
 
-def synthesize(text: str, voice: str, output_path: str) -> str:
+def synthesize(text: str, voice: str, output_path: str, progress_callback=None, cancel_event=None, run_options=None) -> str:
     g2p = _load_g2p(voice)
     voices = _load_voice(voice)
 
     phonemes, _ = g2p(text)
     batches = _split_phonemes(phonemes)
+    total = len(batches)
 
     waveforms: list[np.ndarray] = []
-    for batch in batches:
+    for i, batch in enumerate(batches):
+        if cancel_event and cancel_event.is_set():
+            return None
         ids = _phonemes_to_ids(batch)
-        wav = _infer(ids, voices)
+        wav = _infer(ids, voices, run_options)
         wav = _trim_silence(wav)
         waveforms.append(wav)
+        if progress_callback:
+            progress_callback((i + 1) / total)
 
     audio = np.concatenate(waveforms) if waveforms else np.zeros(0, dtype=np.float32)
 
