@@ -21,6 +21,7 @@ import os
 import threading
 
 from gi.repository import Adw, Gtk, Gio, GLib
+from onnxruntime import RunOptions
 from .voice_dialog import VoiceDialog, get_voice_name, get_voice_language
 from .tts_player import TtsPlayer
 from .loading_page import LoadingPage
@@ -41,6 +42,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._cancel_event = None
+        self._run_opts = None
         self.settings = Gio.Settings(schema_id='dev.ahmediqbal.parrot')
         self.current_voice_id = self.settings.get_string('voice-id')
         self.voice_selector_content.set_label(get_voice_name(self.current_voice_id))
@@ -73,6 +75,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         out_path = os.path.join(out_dir, 'current.wav')
 
         self._cancel_event = threading.Event()
+        self._run_opts = RunOptions()
 
         def on_cancel():
             dialog = Adw.AlertDialog(
@@ -89,6 +92,7 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
             def on_response(_dialog, response):
                 if response == 'cancel':
                     self._cancel_event.set()
+                    self._run_opts.terminate = True
                     self.navigation_view.pop()
 
             dialog.connect('response', on_response)
@@ -107,13 +111,13 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
 
         threading.Thread(
             target=self._run_synthesis,
-            args=(text, self.current_voice_id, out_path, on_progress, self._cancel_event),
+            args=(text, self.current_voice_id, out_path, on_progress, self._cancel_event, self._run_opts),
             daemon=True,
         ).start()
 
-    def _run_synthesis(self, text, voice_id, out_path, on_progress, cancel_event):
+    def _run_synthesis(self, text, voice_id, out_path, on_progress, cancel_event, run_opts):
         try:
-            path = synthesize(text, voice_id, out_path, on_progress, cancel_event)
+            path = synthesize(text, voice_id, out_path, on_progress, cancel_event, run_opts)
             if not cancel_event.is_set():
                 GLib.idle_add(self._on_synthesis_ready, text, voice_id, path, None)
         except Exception as exc:

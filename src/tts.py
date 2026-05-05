@@ -156,7 +156,7 @@ def _split_phonemes(ph: str) -> list[str]:
     return batches
 
 
-def _infer(ids: list[int], voices: np.ndarray) -> np.ndarray:
+def _infer(ids: list[int], voices: np.ndarray, run_options=None) -> np.ndarray:
     sess = _load_session()
     ref_s = voices[min(len(ids), len(voices) - 1)]
     waveform, _ = sess.run(
@@ -166,6 +166,7 @@ def _infer(ids: list[int], voices: np.ndarray) -> np.ndarray:
             "style": ref_s,
             "speed": np.ones(1, dtype=np.float32),
         },
+        run_options,
     )
     return waveform[0]
 
@@ -176,7 +177,7 @@ def _trim_silence(audio: np.ndarray, top_db: float = 60.0) -> np.ndarray:
     return trimmed
 
 
-def synthesize(text: str, voice: str, output_path: str, progress_callback=None, cancel_event=None) -> str:
+def synthesize(text: str, voice: str, output_path: str, progress_callback=None, cancel_event=None, run_options=None) -> str:
     g2p = _load_g2p(voice)
     voices = _load_voice(voice)
 
@@ -189,7 +190,7 @@ def synthesize(text: str, voice: str, output_path: str, progress_callback=None, 
         if cancel_event and cancel_event.is_set():
             return None
         ids = _phonemes_to_ids(batch)
-        wav = _infer(ids, voices)
+        wav = _infer(ids, voices, run_options)
         wav = _trim_silence(wav)
         waveforms.append(wav)
         if progress_callback:
