@@ -3,6 +3,7 @@ moduledir = pkgdatadir / 'parrot_reader'
 gnome = import('gnome')
 blueprints = custom_target('blueprints',
   input: files(
+    'loading-page.blp',
     'tts-player.blp',
     'shortcuts-dialog.blp',
     'voice-dialog.blp',
@@ -47,6 +48,7 @@ configure_file(
 
 parrot_reader_sources = [
   '__init__.py',
+  'loading_page.py',
   'main.py',
   'tts_player.py',
   'trim.py',

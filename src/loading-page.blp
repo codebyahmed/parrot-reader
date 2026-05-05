@@ -1,0 +1,35 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $LoadingPage: Adw.NavigationPage {
+  title: _("Generating");
+  can-pop: false;
+
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      show-title: false;
+    }
+
+    content: Box {
+      orientation: vertical;
+      spacing: 18;
+      valign: center;
+      halign: center;
+
+      Spinner {
+        spinning: true;
+        width-request: 32;
+        height-request: 32;
+      }
+
+      Label {
+        label: _("Generating audio…");
+
+        styles [
+          "dim-label",
+        ]
+      }
+    };
+  };
+}

@@ -23,6 +23,7 @@ import threading
 from gi.repository import Adw, Gtk, Gio, GLib
 from .voice_dialog import VoiceDialog, get_voice_name
 from .tts_player import TtsPlayer
+from .loading_page import LoadingPage
 from .tts import synthesize
 
 
@@ -71,7 +72,8 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         out_path = os.path.join(out_dir, 'current.wav')
 
         tts_player = TtsPlayer(text=text, voice_id=self.current_voice_id)
-        self.navigation_view.push(tts_player)
+        loading_page = LoadingPage()
+        self.navigation_view.push(loading_page)
 
         threading.Thread(
             target=self._run_synthesis,
@@ -82,6 +84,12 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
     def _run_synthesis(self, text, voice, out_path, tts_player):
         try:
             path = synthesize(text, voice, out_path)
-            GLib.idle_add(tts_player.on_synthesis_done, path, None)
+            GLib.idle_add(self._on_synthesis_ready, tts_player, path, None)
         except Exception as exc:
-            GLib.idle_add(tts_player.on_synthesis_done, None, str(exc))
+            GLib.idle_add(self._on_synthesis_ready, tts_player, None, str(exc))
+
+    def _on_synthesis_ready(self, tts_player, path, error):
+        tts_player.on_synthesis_done(path, error)
+        home = self.navigation_view.find_page('home')
+        self.navigation_view.replace([home, tts_player])
+        return False
