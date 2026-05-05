@@ -97,6 +97,11 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
     def _on_synthesis_ready(self, text, voice_id, path, error):
         tts_player = TtsPlayer(text=text, voice_id=voice_id)
         tts_player.on_synthesis_done(path, error)
+        loading_page = self.navigation_view.get_visible_page()
+        self.navigation_view.push(tts_player)
+        loading_page.connect('hidden', self._on_loading_hidden, tts_player)
+        return False
+
+    def _on_loading_hidden(self, _loading_page, tts_player):
         home = self.navigation_view.find_page('home')
         self.navigation_view.replace([home, tts_player])
-        return False
