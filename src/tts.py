@@ -9,6 +9,13 @@ from ._config import PKGDATADIR as BASE
 SAMPLE_RATE = 24_000
 MAX_PHONEME_LENGTH = 510
 
+
+def title_from_text(text: str) -> str:
+    words = text.split()[:5]
+    cleaned = (re.sub(r'[^\w]', '', w) for w in words if w)
+    slug = ' '.join(w for w in cleaned if w)
+    return (slug[:48] or 'Speech').capitalize()
+
 _VOCAB: dict[str, int] = {
     "$": 0, ";": 1, ":": 2, ",": 3, ".": 4, "!": 5, "?": 6,
     "—": 9, "…": 10, "\"": 11, "(": 12, ")": 13,

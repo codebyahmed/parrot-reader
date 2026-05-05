@@ -1,11 +1,11 @@
 import gi
 import shutil
 import threading
-import re
 gi.require_version('Gst', '1.0')
 
 from gi.repository import Adw, Gtk, GLib, Gst
 from .voice_dialog import get_voice_name, get_voice_language
+from .tts import title_from_text
 
 Gst.init(None)
 
@@ -34,7 +34,7 @@ class TtsPlayer(Adw.NavigationPage):
 
     def __init__(self, text: str, voice_id: str, **kwargs):
         super().__init__(**kwargs)
-        title = self._title_from_text(text)
+        title = title_from_text(text)
         self.window_title.set_title(title)
         self.window_title.set_subtitle(f'{get_voice_name(voice_id)} • {get_voice_language(voice_id)}')
         self._pipeline = None
@@ -60,13 +60,6 @@ class TtsPlayer(Adw.NavigationPage):
         self.volume_down_button.connect('clicked', self._on_volume_down_clicked)
         self.seek_bar.connect('value-changed', self._on_seek_changed)
         self.connect('hiding', self._on_hiding)
-
-    @staticmethod
-    def _title_from_text(text: str) -> str:
-        words = text.split()[:5]
-        cleaned = (re.sub(r'[^\w]', '', w) for w in words if w)
-        slug = ' '.join(w for w in cleaned if w)
-        return (slug[:48] or 'Speech').capitalize()
 
     @staticmethod
     def _fmt(ns):

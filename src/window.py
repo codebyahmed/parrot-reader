@@ -21,10 +21,10 @@ import os
 import threading
 
 from gi.repository import Adw, Gtk, Gio, GLib
-from .voice_dialog import VoiceDialog, get_voice_name
+from .voice_dialog import VoiceDialog, get_voice_name, get_voice_language
 from .tts_player import TtsPlayer
 from .loading_page import LoadingPage
-from .tts import synthesize
+from .tts import synthesize, title_from_text
 
 
 @Gtk.Template(resource_path='/dev/ahmediqbal/parrot/window.ui')
@@ -71,10 +71,10 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
         out_dir = os.path.join(GLib.get_user_cache_dir(), 'parrot-reader')
         out_path = os.path.join(out_dir, 'current.wav')
 
-        tts_player = TtsPlayer(text=text, voice_id=self.current_voice_id)
+        voice_info = f'{get_voice_name(self.current_voice_id)} • {get_voice_language(self.current_voice_id)}'
         loading_page = LoadingPage(
-            audio_title=tts_player.window_title.get_title(),
-            voice_info=tts_player.window_title.get_subtitle(),
+            audio_title=title_from_text(text),
+            voice_info=voice_info,
         )
         self.navigation_view.push(loading_page)
 
@@ -83,18 +83,19 @@ class ParrotReaderWindow(Adw.ApplicationWindow):
 
         threading.Thread(
             target=self._run_synthesis,
-            args=(text, self.current_voice_id, out_path, tts_player, on_progress),
+            args=(text, self.current_voice_id, out_path, on_progress),
             daemon=True,
         ).start()
 
-    def _run_synthesis(self, text, voice, out_path, tts_player, on_progress):
+    def _run_synthesis(self, text, voice_id, out_path, on_progress):
         try:
-            path = synthesize(text, voice, out_path, on_progress)
-            GLib.idle_add(self._on_synthesis_ready, tts_player, path, None)
+            path = synthesize(text, voice_id, out_path, on_progress)
+            GLib.idle_add(self._on_synthesis_ready, text, voice_id, path, None)
         except Exception as exc:
-            GLib.idle_add(self._on_synthesis_ready, tts_player, None, str(exc))
+            GLib.idle_add(self._on_synthesis_ready, text, voice_id, None, str(exc))
 
-    def _on_synthesis_ready(self, tts_player, path, error):
+    def _on_synthesis_ready(self, text, voice_id, path, error):
+        tts_player = TtsPlayer(text=text, voice_id=voice_id)
         tts_player.on_synthesis_done(path, error)
         home = self.navigation_view.find_page('home')
         self.navigation_view.replace([home, tts_player])
