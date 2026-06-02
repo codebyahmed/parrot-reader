@@ -9,6 +9,12 @@ A text-to-speech reader for the GNOME desktop powered by [Kokoro](https://huggin
 - Playback controls: play/pause, seek, rewind/forward 10s, speed (0.5× – 2×), volume
 - Export generated audio
 
+## Screenshots
+
+| Player | Dark Mode |
+|:---:|:---:|
+| ![Player](screenshots/player.png) | ![Dark Mode](screenshots/player-dark.png) |
+
 ## Building
 
 Requires [GNOME Builder](https://apps.gnome.org/Builder/) and the GNOME Platform Flatpak runtime.
